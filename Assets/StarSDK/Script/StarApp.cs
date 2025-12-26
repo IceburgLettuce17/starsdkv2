@@ -6,6 +6,7 @@ using UnityEngine;
 //    StarApp - Star Studios SDK App class
 //    Easy way to launch your app.
 //    Contains methods to check when actions are done.
+//	  By Akira and John B
 //------------------------------------------------------------------------------
 
 
@@ -131,7 +132,7 @@ public abstract class StarApp : MonoBehaviour
 	// You have to do the logic from here.
 	// This function is called once per frame and from Update().
 	//------------------------------------------------------------------------------
-	abstract void UpdateApp();
+	public abstract void UpdateApp();
 	
 	//------------------------------------------------------------------------------
 	// If your game has click-to-move style movement using the left mouse button, 
