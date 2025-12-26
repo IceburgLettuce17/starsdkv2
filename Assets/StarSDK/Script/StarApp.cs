@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿#define EXIT_ON_OPENURLPREDEF // StarSDKConfig.exitAfterOpenUrlPredef
+// For configs we are using ifdefs until a StarSDKConfig class is done
+using UnityEngine;
 
 //------------------------------------------------------------------------------
 //    StarApp - Star Studios SDK App class
@@ -6,10 +8,12 @@
 //    Contains methods to check when actions are done.
 //------------------------------------------------------------------------------
 
+
+
 public class StarApp : MonoBehaviour
 {
 	public const int MOUSEBUTTON_LEFT = 0;
-	public const int MOUSEBUTTON_LEFT = 1;
+	public const int MOUSEBUTTON_RIGHT = 1;
 	
 	private void Start()
 	{
@@ -24,22 +28,92 @@ public class StarApp : MonoBehaviour
 	private void Update()
 	{
 		// checker for mouse funcs
-		if (Input.GetMouseButtonDown(MOUSEBUTTON_LEFT)
+		if (Input.GetMouseButtonDown(MOUSEBUTTON_LEFT))
 		{
 			OnMouseLeft();
 		}
-		if (Input.GetMouseButtonDown(MOUSEBUTTON_RIGHT)
+		if (Input.GetMouseButtonDown(MOUSEBUTTON_RIGHT))
 		{
 			OnMouseRight();
 		}
 		
-		
+		// akira add
+		if (s_urlOpenPending)
+		{
+			OpenURLPredef();
+		}
 		UpdateApp();
+	}
+	
+	// akira add (for StarApp::UnityWrapper.OpenURL(string))
+	
+	// Stores the URL that will be opened next OpenURLPredef call
+	private static string s_urlToOpen;
+	
+	// Indicates that an OpenURLPredef call in happening
+	private static bool s_urlOpenPending;
+	
+	
+	//------------------------------------------------------------------------------
+	//Request to quit the app.
+	//When Exit or Quit option is selected (or the app quits for any other reason) you should call this function.
+	//------------------------------------------------------------------------------
+	static protected void Quit()
+	{
+		Debug.Log("StarApp.quit");
+
+		Application.Quit();
+	}
+
+	//------------------------------------------------------------------------------
+	// StarApp : Unity misc. wrapper
+	// wrapper for some usual unity function, use this instead of the unity ones
+	//------------------------------------------------------------------------------
+	
+	//------------------------------------------------------------------------------
+	//Performs Application.OpenURL
+	//
+	//This method wraps calls to OpenURL, incorporating some workarounds for usual OpenURL problems
+	//@param url the url to open
+	//@return if the opening was successful
+	//------------------------------------------------------------------------------
+	public void OpenURL(string url)
+	{
+		try
+		{
+			Application.OpenURL(url);
+		}
+		catch (Exception except)
+		{
+			Debug.Log("OpenURL Failed with url " + url + " with exception " + except.ToString());
+		}
+	}
+	
+	private static void OpenURLPredef()
+	{
+		s_urlOpenPending = false;
+		
+		if (s_urlToOpen != null)
+		{
+			try
+			{
+				Application.OpenURL(s_urlToOpen);
+			}
+			catch (Exception e)
+			{
+
+			}
+		}
+		#if EXIT_ON_OPENURLPREDEF
+			Quit();
+		#endif
 	}
 	
 	private bool IsStarAppBase()
 	{
-		return typeof(this) == typeof(StarApp);
+		// akira: really bad hack because typeof(this) doesnt work
+		StarApp app = this;
+		return typeof(app) == typeof(StarApp);
 	}
 	
 	// John B: added helper methods that run every frame
@@ -64,12 +138,12 @@ public class StarApp : MonoBehaviour
 	// make sure to override this function and implement it from here.
 	// This function is called from Update().
 	//------------------------------------------------------------------------------
-	public void OnMouseLeft(){};
+	public void OnMouseLeft(){}
 	
 	//------------------------------------------------------------------------------
 	// If your game has actions that are done using the right mouse button, 
 	// make sure to override this function and implement it from here.
 	// This function is called from Update().
 	//------------------------------------------------------------------------------
-	public void OnMouseRight(){};
+	public void OnMouseRight(){}
 }
