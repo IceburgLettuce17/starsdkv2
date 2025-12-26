@@ -10,7 +10,7 @@ using UnityEngine;
 
 
 
-public class StarApp : MonoBehaviour
+public abstract class StarApp : MonoBehaviour
 {
 	public const int MOUSEBUTTON_LEFT = 0;
 	public const int MOUSEBUTTON_RIGHT = 1;
