@@ -1,13 +1,10 @@
-﻿#define EXIT_ON_OPENURLPREDEF // StarSDKConfig.exitAfterOpenUrlPredef
-// For configs we are using ifdefs until a StarSDKConfig class is done
-using UnityEngine;
+﻿using UnityEngine;
 using System;
-
 
 #pragma warning disable 0649 // s_urlToOpen should be set in implemented class
 //------------------------------------------------------------------------------
 //    StarApp - Star Studios SDK App class
-//    Easy way to launch your app.
+//    Easy way to make your app.
 //    Contains methods to check when actions are done.
 //	  By Akira and John B
 //------------------------------------------------------------------------------
@@ -19,13 +16,47 @@ public abstract class StarApp : MonoBehaviour
 	public const int MOUSEBUTTON_LEFT = 0;
 	public const int MOUSEBUTTON_RIGHT = 1;
 	
+	//--------------------------------------//
+	//           State Machine				//
+	//           By Akira					//
+	//--------------------------------------//
+	
+	// Do not mess with this; this is StarApp default states
+	public const int STATE_QUIT = -1;
+	public const int STATE_NORMAL = 0;
+	public const int STATE_INMENU = 1;
+	
+	// State variable (it can be any of STATE_ consts)
+	public static int s_sappState = STATE_NORMAL;
+	
+	public void StateMachineInit(int state)
+	{
+		switch (state)
+		{
+			case STATE_QUIT:
+				Application.Quit();
+				break;
+			
+			
+			case STATE_NORMAL:
+				break;
+				
+			case STATE_INMENU:
+				break;
+		}
+	}
+	
+	public abstract void StateMachine_Custom(int state);
+	
+	
 	private void Start()
 	{
 		// John B add
-		if (gameObject.GetComponent<StarApp>() != null && IsStarAppBase())
-		{
-			Debug.Log("StarApp should not be added to a GO directly.");
-		}
+		// Akira: this is deprecated, you cannot add abstracts to a go
+		//if (gameObject.GetComponent<StarApp>() != null && IsStarAppBase())
+		//{
+		//	Debug.Log("StarApp should not be added to a GO directly.");
+		//}
 		StartApp();
 	}
 	
@@ -46,8 +77,26 @@ public abstract class StarApp : MonoBehaviour
 		{
 			OpenURLPredef();
 		}
+		
+		StateMachineInit(s_sappState);
 		UpdateApp();
 	}
+	
+	//------------------------------------------------------------------------------
+	// Quit the app.
+	// When Exit or Quit option is selected (or the app quits for any other reason) you should call this function.
+	//------------------------------------------------------------------------------
+	static protected void Quit()
+	{
+		Debug.Log("StarApp.quit");
+
+		s_sappState = STATE_QUIT;
+	}
+
+	//------------------------------------------------------------------------------
+	// StarApp : Unity misc. wrapper
+	// wrapper for some usual unity function, use this instead of the unity ones
+	//------------------------------------------------------------------------------
 	
 	// akira add (for StarApp::UnityWrapper.OpenURL(string))
 	
@@ -57,23 +106,6 @@ public abstract class StarApp : MonoBehaviour
 	// Indicates that an OpenURLPredef call in happening
 	private static bool s_urlOpenPending;
 	
-	
-	//------------------------------------------------------------------------------
-	//Request to quit the app.
-	//When Exit or Quit option is selected (or the app quits for any other reason) you should call this function.
-	//------------------------------------------------------------------------------
-	static protected void Quit()
-	{
-		Debug.Log("StarApp.quit");
-
-		Application.Quit();
-	}
-
-	//------------------------------------------------------------------------------
-	// StarApp : Unity misc. wrapper
-	// wrapper for some usual unity function, use this instead of the unity ones
-	//------------------------------------------------------------------------------
-	
 	//------------------------------------------------------------------------------
 	//Performs Application.OpenURL
 	//
@@ -81,16 +113,10 @@ public abstract class StarApp : MonoBehaviour
 	//@param url the url to open
 	//@return if the opening was successful
 	//------------------------------------------------------------------------------
-	public void OpenURL(string url)
+	public static void OpenURL(string url)
 	{
-		try
-		{
-			Application.OpenURL(url);
-		}
-		catch (Exception except)
-		{
-			Debug.Log("OpenURL Failed with url " + url + " with exception " + except.ToString());
-		}
+		Application.OpenURL(url);
+		Debug.Log("openurl called");
 	}
 	
 	private static void OpenURLPredef()
@@ -99,21 +125,20 @@ public abstract class StarApp : MonoBehaviour
 		
 		if (s_urlToOpen != null)
 		{
-			try
-			{
-				Application.OpenURL(s_urlToOpen);
-			}
-			catch (Exception){}
+			Application.OpenURL(s_urlToOpen);
 		}
-		#if EXIT_ON_OPENURLPREDEF
+		if (StarSDKConfig.exitAfterOpenUrlPredef)
+		{
 			Quit();
-		#endif
+		}
+		
 	}
 	
-	private bool IsStarAppBase()
-	{
-		return this.GetType() == typeof(StarApp);
-	}
+	// this is not used
+	//private bool IsStarAppBase()
+	//{
+	//	return this.GetType() == typeof(StarApp);
+	//}
 	
 	// John B: added helper methods that run every frame
 	
