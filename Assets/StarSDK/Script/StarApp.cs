@@ -1,7 +1,10 @@
 ﻿#define EXIT_ON_OPENURLPREDEF // StarSDKConfig.exitAfterOpenUrlPredef
 // For configs we are using ifdefs until a StarSDKConfig class is done
 using UnityEngine;
+using System;
 
+
+#pragma warning disable 0649 // s_urlToOpen should be set in implemented class
 //------------------------------------------------------------------------------
 //    StarApp - Star Studios SDK App class
 //    Easy way to launch your app.
@@ -100,10 +103,7 @@ public abstract class StarApp : MonoBehaviour
 			{
 				Application.OpenURL(s_urlToOpen);
 			}
-			catch (Exception e)
-			{
-
-			}
+			catch (Exception){}
 		}
 		#if EXIT_ON_OPENURLPREDEF
 			Quit();
@@ -112,19 +112,17 @@ public abstract class StarApp : MonoBehaviour
 	
 	private bool IsStarAppBase()
 	{
-		// akira: really bad hack because typeof(this) doesnt work
-		StarApp app = this;
-		return typeof(app) == typeof(StarApp);
+		return this.GetType() == typeof(StarApp);
 	}
 	
 	// John B: added helper methods that run every frame
 	
 	//------------------------------------------------------------------------------
-	// This method is purely optional and does not need to be implemented to run.
+	// his method needs to be implemented in every StarApp.
 	// Simple tasks that should run once should go here.
 	// This function is called once every launch and from Start().
 	//------------------------------------------------------------------------------
-	public void StartApp(){}
+	public abstract void StartApp();
 	
 	//------------------------------------------------------------------------------
 	// This method needs to be implemented in every StarApp.
@@ -139,12 +137,12 @@ public abstract class StarApp : MonoBehaviour
 	// make sure to override this function and implement it from here.
 	// This function is called from Update().
 	//------------------------------------------------------------------------------
-	public void OnMouseLeft(){}
+	public abstract void OnMouseLeft();
 	
 	//------------------------------------------------------------------------------
 	// If your game has actions that are done using the right mouse button, 
 	// make sure to override this function and implement it from here.
 	// This function is called from Update().
 	//------------------------------------------------------------------------------
-	public void OnMouseRight(){}
+	public abstract void OnMouseRight();
 }
