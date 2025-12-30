@@ -6,6 +6,14 @@ namespace UnityEngineMod
 	{
 		private static bool s_debugLogInApplicationQuit = true;
 		
+		public static string version
+		{
+			get
+			{
+				return "";
+			}
+		}
+		
 		public static void Quit(int arg0)
 		{
 			// WRAPPER CALL - UnityEngine.Application.Quit(int arg0)
@@ -21,5 +29,9 @@ namespace UnityEngineMod
 		{
 			Quit(1);
 		}
+		
+		
+		///////////////////////////////////////////////////////
+		
 	}
 }

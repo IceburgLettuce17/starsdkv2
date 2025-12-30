@@ -29,6 +29,16 @@ public abstract class StarApp : MonoBehaviour
 	// State variable (it can be any of STATE_ consts)
 	public static int s_sappState = STATE_NORMAL;
 	
+	public static StarAppDescriptor s_descriptor;
+	
+	public static void SetDescriptorValues(string name, string desc, string provider, string ver, StarApp app)
+	{
+		s_descriptor.appName = name;
+		s_descriptor.appDescription = desc;
+		s_descriptor.appProvider = provider;
+		s_descriptor.appVersion = ver;
+		s_descriptor.appClass = app;
+	}
 	public void StateMachineInit(int state)
 	{
 		switch (state)

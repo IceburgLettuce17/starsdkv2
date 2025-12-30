@@ -20,6 +20,11 @@ public class SampleApp : StarApp
 	public override void StartApp()
 	{
 		Debug.Log("StartApp");
+		StarApp.SetDescriptorValues("Sample StarSDK App",
+		"StarSDK Test App",
+		"Star Studios",
+		"1.0.0",
+		this);
 	}
 	
 	public override void UpdateApp()
